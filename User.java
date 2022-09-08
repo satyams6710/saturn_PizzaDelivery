@@ -2,6 +2,8 @@ package pizzaDelivery;
 
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.sql.DriverManager;
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -13,15 +15,45 @@ import java.sql.Connection;
 
 public class User {
     String name, email;
-    int phNo;
+    Long phNo;
     Scanner sc = new Scanner(System.in);
 
     void userInfo() {
-        System.out.println("Please Enter your name: ");
-        name = sc.next();
+        int flag1;
+        boolean flag = false;
+        do {
+            Pattern pat1 = Pattern.compile("[(a-z,A-Z)]");
+
+            System.out.println("Please Enter your name: ");
+            name = sc.next();
+            Matcher mat1 = pat1.matcher(name);
+            if (mat1.find()) {
+                flag = true;
+            } else {
+                System.out.println("\nPlease Enter Valid name!!!");
+            }
+        } while (!flag);
         System.out.println("--------------------------------------------------");
-        System.out.println("Please Enter your Mob. No. : ");
-        phNo = sc.nextInt();
+        do {
+            try {
+                long length = 0;
+                while (length != 10) {
+
+                    System.out.println("Please Enter your Mob. No. : ");
+                    phNo = sc.nextLong();
+                    length = (long) (Math.log10(phNo) + 1);
+                    if (length != 10) {
+                        System.out.println("\n *Invalid phone number!* ");
+                    }
+                }
+                flag1 = 1;
+            } catch (InputMismatchException ie) {
+                System.out.println("\n*Please enter digits only*");
+                sc.nextLine();
+                flag1 = 0;
+                continue;
+            }
+        } while (flag1 == 0);
         System.out.println("--------------------------------------------------");
         System.out.println("Please Enter your Email : ");
         email = sc.next();
@@ -76,7 +108,7 @@ public class User {
             if (result.next() != false) {
                 String cname = result.getString("name");
                 String cemail = result.getString("email");
-                int cphone = result.getInt("phone");
+                Long cphone = result.getLong("phone");
                 displayInfo(cname, cemail, cphone);
             }
             statement.close();
@@ -88,7 +120,7 @@ public class User {
         }
     }
 
-    void displayInfo(String bdname, String dbemail, int dbphone) {
+    void displayInfo(String bdname, String dbemail, Long dbphone) {
         int num;
         System.out.println("\n**************************************************");
         System.out.println("| Hey " + bdname + ", We Welcome You Here");
@@ -96,8 +128,8 @@ public class User {
         System.out.println("| Please Verify Your Details                     |");
         System.out.println("--------------------------------------------------");
         System.out.println("| Name: " + bdname);
-        System.out.println("| Mobile No. : " + dbemail);
-        System.out.println("| Email: " + dbphone);
+        System.out.println("| Mobile No. : " + dbphone);
+        System.out.println("| Email: " + dbemail);
         System.out.println("**************************************************");
         System.out.println("\nEnter 1 to Continue OR Enter 2 to Edit");
         num = sc.nextInt();
